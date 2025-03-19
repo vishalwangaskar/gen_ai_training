@@ -18,7 +18,6 @@ public class ChatBotController {
     @Autowired
     ChatBotService chatBotService;
 
-
     @PostMapping
     public ResponseEntity<String> getChatBotResponse(@RequestBody  String content) {
 

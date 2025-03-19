@@ -23,20 +23,10 @@ public class ChatBotServiceImpl implements ChatBotService {
     @Value("${client-openai-deployment-name}")
     String deploymentName;
 
-
+    @Autowired
     private RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
-    private final Semanticak kernel;
 
-    @Override
-    public String connectToDial(ApiRequest apiRequest) {
-        return "";
-    }
-
-
-
-/*
     @Override
     public String connectToDial(ApiRequest apiRequest) {
 
@@ -59,5 +49,5 @@ public class ChatBotServiceImpl implements ChatBotService {
         }
     }
 
- */
+
 }
