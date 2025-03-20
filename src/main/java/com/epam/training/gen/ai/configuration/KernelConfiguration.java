@@ -6,6 +6,8 @@ import com.azure.core.credential.AzureKeyCredential;
 import com.epam.training.gen.ai.model.Plugin;
 import com.microsoft.semantickernel.Kernel;
 import com.microsoft.semantickernel.aiservices.openai.chatcompletion.OpenAIChatCompletion;
+import com.microsoft.semantickernel.orchestration.InvocationContext;
+import com.microsoft.semantickernel.orchestration.PromptExecutionSettings;
 import com.microsoft.semantickernel.plugin.KernelPlugin;
 import com.microsoft.semantickernel.plugin.KernelPluginFactory;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
@@ -53,6 +55,16 @@ public class KernelConfiguration {
         return Kernel.builder()
                 .withAIService(ChatCompletionService.class, chatCompletionService)
                 .withPlugin(kernelPlugin)
+                .build();
+    }
+
+
+    @Bean
+    public InvocationContext invocationContext() {
+        return InvocationContext.builder()
+                .withPromptExecutionSettings(PromptExecutionSettings.builder()
+                        .withTemperature(0)
+                        .build())
                 .build();
     }
 
