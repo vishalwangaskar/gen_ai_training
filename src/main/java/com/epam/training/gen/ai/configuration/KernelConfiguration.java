@@ -11,21 +11,27 @@ import com.microsoft.semantickernel.orchestration.PromptExecutionSettings;
 import com.microsoft.semantickernel.plugin.KernelPlugin;
 import com.microsoft.semantickernel.plugin.KernelPluginFactory;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Configuration
 public class KernelConfiguration {
 
     @Value("${client-openai-key}")
-    String openAiKey;
+    private String openAiKey;
 
     @Value("${client-openai-endpoint}")
-    String openAiEndpoint;
+    private String openAiEndpoint;
 
     @Value("${client-openai-deployment-name}")
-    String openAiDeploymentName;
+    private String openAiDefaultDeploymentName;
+
 
     @Bean
     public OpenAIAsyncClient openAIAsyncClient() {
@@ -38,7 +44,7 @@ public class KernelConfiguration {
     @Bean
     public ChatCompletionService chatCompletionService(OpenAIAsyncClient openAIAsyncClient) {
         return OpenAIChatCompletion.builder()
-                .withModelId(openAiDeploymentName)
+                .withModelId(openAiDefaultDeploymentName)
                 .withOpenAIAsyncClient(openAIAsyncClient)
                 .build();
     }
@@ -66,6 +72,42 @@ public class KernelConfiguration {
                         .withTemperature(0)
                         .build())
                 .build();
+    }
+
+    @Bean
+    public Map<String, PromptExecutionSettings> promptExecutionsSettingsMap(
+            @Value("${client-openai-deployment-name}") String deploymentOrModelName) {
+        return Map.of(deploymentOrModelName, PromptExecutionSettings.builder()
+                .withTemperature(0.8)
+
+                .build());
+    }
+
+    @Bean
+    @Scope(value = "prototype")
+    public Kernel kernelWithChatCompletionService(final ChatCompletionService chatCompletionService) {
+        return Kernel.builder()
+                .withAIService(ChatCompletionService.class, chatCompletionService)
+                .build();
+    }
+
+    @Bean
+    @Scope(value = "prototype")
+    public ChatCompletionService chatCompletionServiceWithDeploymentModel(
+            @Value("${client-openai-deployment-name}") String deploymentModelName,
+            final OpenAIAsyncClient openAIAsyncClient) {
+        return OpenAIChatCompletion.builder()
+                .withModelId(deploymentModelName)
+                .withModelId(ObjectUtils.isEmpty(deploymentModelName)
+                        ? openAiDefaultDeploymentName : deploymentModelName)
+                .withOpenAIAsyncClient(openAIAsyncClient)
+                .build();
+    }
+
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 }
