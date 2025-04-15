@@ -4,6 +4,8 @@ import com.azure.ai.openai.OpenAIAsyncClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.AzureKeyCredential;
 import com.epam.training.gen.ai.model.Plugin;
+import com.epam.training.gen.ai.plugin.AgeBasedOnBirthday;
+import com.epam.training.gen.ai.plugin.ConvertTemperaturePlugin;
 import com.microsoft.semantickernel.Kernel;
 import com.microsoft.semantickernel.aiservices.openai.chatcompletion.OpenAIChatCompletion;
 import com.microsoft.semantickernel.orchestration.InvocationContext;
@@ -58,9 +60,14 @@ public class KernelConfiguration {
 
     @Bean
     public Kernel kernel(ChatCompletionService chatCompletionService, KernelPlugin kernelPlugin) {
+        var convertTemperaturePlugin =
+                KernelPluginFactory.createFromObject(new ConvertTemperaturePlugin(), "ConvertTemperaturePlugin");
+        var ageBasedOnBirthdayPlugin =
+                KernelPluginFactory.createFromObject(new AgeBasedOnBirthday(), "AgeBasedOnBirthday");
         return Kernel.builder()
                 .withAIService(ChatCompletionService.class, chatCompletionService)
-                .withPlugin(kernelPlugin)
+                .withPlugin(convertTemperaturePlugin)
+                .withPlugin(ageBasedOnBirthdayPlugin)
                 .build();
     }
 

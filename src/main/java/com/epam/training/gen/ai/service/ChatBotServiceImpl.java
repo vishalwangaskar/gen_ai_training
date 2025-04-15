@@ -5,12 +5,14 @@ import com.epam.training.gen.ai.model.ChatBotRequestDto;
 import com.microsoft.semantickernel.Kernel;
 import com.microsoft.semantickernel.orchestration.InvocationContext;
 import com.microsoft.semantickernel.orchestration.PromptExecutionSettings;
+import com.microsoft.semantickernel.orchestration.ToolCallBehavior;
 import com.microsoft.semantickernel.semanticfunctions.KernelFunctionArguments;
 import com.microsoft.semantickernel.services.chatcompletion.AuthorRole;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
 import com.microsoft.semantickernel.services.chatcompletion.ChatHistory;
 import com.microsoft.semantickernel.services.chatcompletion.ChatMessageContent;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
@@ -75,13 +77,17 @@ public class ChatBotServiceImpl implements ChatBotService {
         chatHistory.addUserMessage(chatBotRequestDto.getPrompt());
         var response = completionService.getChatMessageContentsAsync(
                 chatHistory, getKernel(chatCompletionService),
-                new InvocationContext.Builder().withPromptExecutionSettings(PromptExecutionSettings.builder().withTemperature(chatBotRequestDto.getTemperature())
+                new InvocationContext.Builder()
+                        .withToolCallBehavior(ToolCallBehavior.allowAllKernelFunctions(true))
+                        .withPromptExecutionSettings(PromptExecutionSettings.builder().withTemperature(chatBotRequestDto.getTemperature())
                         .withMaxTokens(chatBotRequestDto.getMaxTokens()).build()).build()).block();
         var responseResult = new StringBuilder();
         if (response == null || response.isEmpty()) {
             return StringUtils.EMPTY;
         }
-        response.stream().filter(result -> result.getAuthorRole() == AuthorRole.ASSISTANT).forEach(result -> {
+        response.stream().filter(result -> result.getAuthorRole() == AuthorRole.ASSISTANT)
+                .filter(object -> !ObjectUtils.isEmpty(object.getContent()))
+                .forEach(result -> {
             chatHistory.addAssistantMessage(result.getContent());
             responseResult.append(result.getContent());
         });
