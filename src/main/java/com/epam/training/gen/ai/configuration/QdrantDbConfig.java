@@ -2,27 +2,16 @@ package com.epam.training.gen.ai.configuration;
 
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
-import io.qdrant.client.grpc.Collections.Distance;
-import io.qdrant.client.grpc.Collections.VectorParams;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.ExecutionException;
 
 @Configuration
 public class QdrantDbConfig {
 
     @Bean
-    public QdrantClient qdrantClient(EmbeddingsConfig embeddingsconfig) throws InterruptedException, ExecutionException {
-        var client = new QdrantClient(QdrantGrpcClient.newBuilder("localhost", 6334, false).build());
-        collectionExists(client, embeddingsconfig.getCollectionName());
-        return client;
+    public QdrantClient qdrantClient(EmbeddingsConfig embeddingsconfig)  {
+        return new QdrantClient(QdrantGrpcClient.newBuilder("localhost", 6334, false).build());
     }
 
-    private void collectionExists(QdrantClient qdrantClient, String collectionName) throws InterruptedException, ExecutionException {
-        var isPresent = qdrantClient.collectionExistsAsync(collectionName).get();
-        if (!isPresent) {
-            qdrantClient.createCollectionAsync(collectionName, VectorParams.newBuilder().setDistance(Distance.Cosine).setSize(4).build()).get();
-        }
-    }
+
 }

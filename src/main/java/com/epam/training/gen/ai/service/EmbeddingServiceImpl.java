@@ -56,6 +56,20 @@ public class EmbeddingServiceImpl implements EmbeddingService {
                 .map(point -> new Score(point.getId().getUuid(), point.getScore(), point.getPayloadOrDefault("text", value("(no data)")).getStringValue()));
     }
 
+    public Flux<String> buildEmbeddingAndStore(String text) {
+        return buildEmbedding(text)
+                .map(vector -> PointStruct
+                        .newBuilder()
+                        .setId(id(UUID.nameUUIDFromBytes(text.getBytes())))
+                        .setVectors(vectors(vector))
+                        .putPayload("text", value(text))
+                        .build())
+                .buffer()
+                .map(points -> qdrantClient.upsertAsync(embeddingsconfig.getCollectionName(), points))
+                .flatMap(this::toMono)
+                .map(result -> result.getStatus().name());
+    }
+
     private SearchPoints createSearchPoints(List<Float> vector) {
         return SearchPoints.newBuilder().setCollectionName(embeddingsconfig.getCollectionName()).addAllVector(vector).setLimit(embeddingsconfig.getSearchLimit())
                 .setWithPayload(WithPayloadSelectorFactory.enable(true)).build();

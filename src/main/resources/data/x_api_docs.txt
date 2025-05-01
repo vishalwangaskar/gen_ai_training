@@ -1,0 +1,14 @@
+X API platform resources
+In the API design space, a resource is an entity with associated data, relationships to other resources, and a set of methods that operate on it. For example, a Post is a resource that you can create, delete, or retrieve using a variety of different tools, such as historically searching for them, or retrieving them in real-time.
+
+The X API provides access to create, delete, receive, or adjust a variety of different resources on the platform including the following:
+
+Resource	Description
+Posts   - Tap into millions of Posts to understand the public conversation, or create your own to engage with the conversation. Current availability: - X API v2 - Enterprise - Standard v1.1
+Users	- Manage or look up X users to analyze networks, understand your audience, or foster positive online relationships. Current availability: - X API v2 - Enterprise - Standard v1.1
+Spaces	- Look up and search X Spaces and their attendees to help people find interesting and relevant audio conversations. Current availability: - X API v2
+Direct Messages -	Send and receive Direct Messages to triage customer issues, send welcome messages, or create positive human interaction. Current availability: - Standard v1.1
+Lists	- Curate and manage lists of accounts to keep a pulse on industry experts, powerful voices, or organize who you follow. Current availability: - X API v2 - Standard v1.1
+Trends	- Identify geographic trends first to pinpoint industry movement, discover hot topics, or stay ahead of the latest fad. Current availability: - Standard v1.1
+Media	- Upload media objects to share your creative energy, create interactive experiences, or build accessibility tools. Current availability: - Standard v1.1
+Places	- Search for places to understand what’s happening in your neighborhood and around the world. Current availability: - Standard v1.1
